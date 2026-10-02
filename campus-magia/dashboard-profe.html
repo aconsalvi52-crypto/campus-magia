@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>EAAM | Gran Maestro (Admin)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Cinzel', 'serif'] }, colors: { dark: '#050505', surface: '#0a0a0c', primary: '#d4af37' } } } }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #fff; overflow-x: hidden; }
+        .glass { background: rgba(10, 10, 12, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(212,175,55,0.15); }
+        .btn-action { transition: all 0.2s; }
+        .btn-action:hover { transform: scale(1.05); }
+        .tab-btn.active { color: #d4af37; border-bottom: 2px solid #d4af37; }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+    </style>
+</head>
+<body class="min-h-screen bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] relative">
+    
+    <div id="loading" class="fixed inset-0 flex items-center justify-center bg-dark z-[200]">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+    </div>
+
+    <div id="app-content" class="hidden max-w-7xl mx-auto p-6">
+        <header class="flex flex-col md:flex-row justify-between items-center glass p-6 rounded-2xl mb-6">
+            <div class="mb-4 md:mb-0">
+                <h1 class="text-2xl font-serif font-bold text-primary">Inquisición (Panel del Maestro)</h1>
+                <p class="text-sm text-gray-400">Gestiona a los iniciados, módulos, exámenes y correspondencia.</p>
+            </div>
+            <button id="btn-logout" class="text-sm text-primary hover:text-white transition-colors border border-primary px-4 py-2 rounded">Cerrar Tomo</button>
+        </header>
+
+        <!-- Navegación por Tabs -->
+        <div class="flex border-b border-gray-800 mb-6 space-x-6 overflow-x-auto whitespace-nowrap">
+            <button class="tab-btn active pb-3 text-gray-400 font-medium hover:text-primary transition-colors border-b-2 border-transparent" data-target="tab-iniciados">Iniciados (Alumnos)</button>
+            <button class="tab-btn pb-3 text-gray-400 font-medium hover:text-primary transition-colors border-b-2 border-transparent" data-target="tab-modulos">Módulos y Material</button>
+            <button class="tab-btn pb-3 text-gray-400 font-medium hover:text-primary transition-colors border-b-2 border-transparent" data-target="tab-examenes">Exámenes</button>
+            <button class="tab-btn pb-3 text-gray-400 font-medium hover:text-primary transition-colors border-b-2 border-transparent" data-target="tab-mensajes">Buzón de Mensajes</button>
+        </div>
+
+        <!-- TAB: Iniciados -->
+        <div id="tab-iniciados" class="tab-content active glass p-6 rounded-2xl">
+            <h2 class="text-xl font-serif text-white mb-6">Iniciados en la Puerta</h2>
+            
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <thead class="text-gray-400 border-b border-gray-700/50">
+                        <tr>
+                            <th class="py-3 px-4">Alias</th>
+                            <th class="py-3 px-4">Correo</th>
+                            <th class="py-3 px-4">Rol</th>
+                            <th class="py-3 px-4">Estado</th>
+                            <th class="py-3 px-4 text-right">El Veredicto / Acción</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-tbody" class="divide-y divide-gray-800">
+                        <!-- Filas insertadas via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- TAB: Módulos y Material -->
+        <div id="tab-modulos" class="tab-content glass p-6 rounded-2xl">
+            <div class="flex flex-col md:flex-row justify-between items-center mb-6">
+                <h2 class="text-xl font-serif text-white mb-4 md:mb-0">Módulos de Enseñanza</h2>
+                <button id="btn-create-module" class="bg-primary text-dark px-4 py-2 rounded font-bold hover:bg-yellow-500 transition-colors shadow-[0_0_15px_rgba(212,175,55,0.4)]">+ Crear Módulo</button>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Crear Modulo Formulario -->
+                <div class="border border-gray-700/50 bg-black/40 rounded-lg p-5">
+                    <h3 class="text-lg font-bold text-primary mb-4 flex items-center"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> Subir Material</h3>
+                    <input type="text" id="material-title" placeholder="Título del Material" class="w-full bg-dark border border-gray-700 rounded p-3 mb-3 text-white focus:border-primary focus:outline-none transition-colors">
+                    <select id="material-module-select" class="w-full bg-dark border border-gray-700 rounded p-3 mb-3 text-gray-300 focus:border-primary focus:outline-none transition-colors">
+                        <option value="">Seleccionar Módulo de destino...</option>
+                    </select>
+                    <select id="material-type-select" class="w-full bg-dark border border-gray-700 rounded p-3 mb-3 text-gray-300 focus:border-primary focus:outline-none transition-colors">
+                        <option value="youtube">Video de YouTube</option>
+                        <option value="drive">Enlace a Google Drive o Web (PDF/Docs)</option>
+                        <option value="image">Enlace directo a Imagen</option>
+                    </select>
+                    <input type="url" id="material-url" placeholder="Pega el enlace aquí (YouTube, Drive, etc.)" class="w-full bg-dark border border-gray-700 rounded p-3 mb-4 text-white focus:border-primary focus:outline-none transition-colors">
+                    <button id="btn-upload-material" class="w-full bg-primary/10 text-primary border border-primary px-4 py-3 rounded hover:bg-primary hover:text-dark transition-all font-semibold mb-2">Vincular al Módulo</button>
+                    <div id="upload-status" class="text-sm text-primary text-center hidden font-bold">Subiendo... 0%</div>
+                </div>
+                <!-- Lista de Modulos -->
+                <div class="border border-gray-700/50 bg-black/40 rounded-lg p-5 max-h-[500px] overflow-y-auto">
+                    <h3 class="text-lg font-bold text-primary mb-4 flex items-center"><svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg> Módulos Existentes</h3>
+                    <ul id="modules-list" class="space-y-3 text-gray-300 text-sm">
+                        <!-- Generado por JS -->
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Exámenes -->
+        <div id="tab-examenes" class="tab-content glass p-6 rounded-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-serif text-white">Pruebas y Exámenes</h2>
+                <button id="btn-create-exam" class="bg-primary text-dark px-4 py-2 rounded font-bold hover:bg-yellow-500 transition-colors shadow-[0_0_15px_rgba(212,175,55,0.4)]">+ Nuevo Examen</button>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">Crea cuestionarios (ej. Google Forms) para evaluar el conocimiento de los iniciados.</p>
+            <div id="exams-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="border border-gray-700/50 bg-black/40 rounded-lg p-8 flex flex-col items-center justify-center text-center col-span-full">
+                    <span class="text-gray-400 font-medium">Cargando exámenes...</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB: Buzón de Mensajes -->
+        <div id="tab-mensajes" class="tab-content glass p-6 rounded-2xl">
+            <h2 class="text-xl font-serif text-white mb-6">Correspondencia (Buzón de Mensajes)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 h-[500px]">
+                <!-- Lista de chats -->
+                <div class="border border-gray-700/50 bg-black/40 rounded-lg p-3 overflow-y-auto flex flex-col gap-2 max-h-[500px]">
+                    <h3 class="text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider px-2">Bandeja de Entrada</h3>
+                    
+                    <div id="inbox-list" class="space-y-2">
+                        <span class="text-xs text-gray-500 italic px-2">Cargando auras...</span>
+                    </div>
+                </div>
+                
+                <!-- Área de chat -->
+                <div id="chat-area" class="col-span-1 md:col-span-2 border border-gray-700/50 bg-black/60 rounded-lg flex flex-col relative hidden">
+                    <!-- Chat Header -->
+                    <div class="border-b border-gray-700/50 p-4 flex items-center justify-between bg-dark/50 rounded-t-lg">
+                        <div class="flex items-center gap-3">
+                            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-primary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            </div>
+                            <div>
+                                <h3 id="chat-header-name" class="font-bold text-white leading-tight">Mago Novato</h3>
+                                <span class="text-xs text-primary">Estudiante</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Mensajes -->
+                    <div id="teacher-chat-messages" class="flex-1 p-5 overflow-y-auto space-y-4 max-h-[400px]">
+                    </div>
+                    
+                    <!-- Input de mensaje -->
+                    <div class="border-t border-gray-700/50 p-4 bg-dark/50 rounded-b-lg flex gap-3">
+                        <input type="text" id="teacher-chat-input" placeholder="Escribe tu consejo mágico..." class="flex-1 bg-black border border-gray-700 rounded-lg px-4 text-sm text-white focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all shadow-inner">
+                        <button id="btn-teacher-send" class="bg-primary text-dark px-6 py-2 rounded-lg font-bold hover:bg-yellow-500 transition-colors shadow-lg flex items-center gap-2">
+                            <span>Enviar</span>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="no-chat-selected" class="col-span-1 md:col-span-2 border border-gray-700/50 bg-black/60 rounded-lg flex items-center justify-center p-10">
+                    <span class="text-gray-500 italic text-center">Selecciona un aprendiz<br>para ver sus mensajes.</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Modal Accesos -->
+    <div id="modal-accesos" class="hidden fixed inset-0 bg-black/80 backdrop-blur z-[300] flex items-center justify-center p-4">
+        <div class="glass p-6 rounded-2xl w-full max-w-md relative max-h-[90vh] flex flex-col">
+            <button id="close-modal-accesos" class="absolute top-4 right-4 text-gray-400 hover:text-white text-xl font-bold">&times;</button>
+            <h2 class="text-xl font-serif text-white mb-2">Gestionar Accesos</h2>
+            <p class="text-sm text-gray-400 mb-4">Selecciona qué módulos y exámenes puede ver este alumno.</p>
+            
+            <div class="overflow-y-auto flex-1 custom-scrollbar mb-4 pr-2">
+                <h3 class="text-sm font-bold text-primary mb-2">Módulos</h3>
+                <div id="accesos-list" class="space-y-3 mb-6">
+                    <!-- Checkboxes modules -->
+                </div>
+                
+                <h3 class="text-sm font-bold text-primary mb-2">Exámenes</h3>
+                <div id="accesos-exams-list" class="space-y-3">
+                    <!-- Checkboxes exams -->
+                </div>
+            </div>
+            
+            <button id="btn-save-accesos" class="w-full bg-primary text-dark font-bold py-3 rounded hover:bg-yellow-500 transition-colors mt-auto">Guardar Accesos</button>
+        </div>
+    </div>
+    
+    <script type="module">
+        import { auth, db, storage } from './firebase-config.js';
+        import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+        import { doc, getDoc, collection, getDocs, updateDoc, addDoc, deleteDoc, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { ref, uploadBytesResumable, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+        document.getElementById('btn-logout').addEventListener('click', () => {
+            signOut(auth).then(() => { window.location.href = 'index.html'; });
+        });
+
+        let currentManageUid = null;
+        const modalAccesos = document.getElementById('modal-accesos');
+        document.getElementById('close-modal-accesos').addEventListener('click', () => modalAccesos.classList.add('hidden'));
+
+        document.getElementById('btn-save-accesos').addEventListener('click', async () => {
+            if (!currentManageUid) return;
+            const btn = document.getElementById('btn-save-accesos');
+            btn.innerText = 'Guardando...';
+            btn.disabled = true;
+            
+            const modCheckboxes = document.querySelectorAll('.module-checkbox');
+            const selectedModules = [];
+            modCheckboxes.forEach(cb => { if (cb.checked) selectedModules.push(cb.value); });
+
+            const examCheckboxes = document.querySelectorAll('.exam-checkbox');
+            const selectedExams = [];
+            examCheckboxes.forEach(cb => { if (cb.checked) selectedExams.push(cb.value); });
+            
+            try {
+                await updateDoc(doc(db, "users", currentManageUid), {
+                    accessibleModules: selectedModules,
+                    accessibleExams: selectedExams
+                });
+                modalAccesos.classList.add('hidden');
+                loadUsers();
+            } catch (err) {
+                console.error(err);
+                alert("Error al guardar accesos.");
+            }
+            btn.innerText = 'Guardar Accesos';
+            btn.disabled = false;
+        });
+
+
+        // Tabs Logic
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // Remove active classes
+                document.querySelectorAll('.tab-btn').forEach(b => {
+                    b.classList.remove('active', 'text-primary', 'border-primary');
+                    b.classList.add('border-transparent');
+                });
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                
+                // Add active classes
+                const target = e.currentTarget;
+                target.classList.add('active', 'text-primary', 'border-primary');
+                target.classList.remove('border-transparent');
+                document.getElementById(target.getAttribute('data-target')).classList.add('active');
+            });
+        });
+
+        // Chat Logic
+        let currentChatUid = null;
+        let currentChatName = "";
+        let chatUnsubscribe = null;
+
+        const loadInbox = () => {
+            const inboxList = document.getElementById('inbox-list');
+            const q = query(collection(db, "users"), where("role", "==", "student"));
+            
+            onSnapshot(q, (snapshot) => {
+                inboxList.innerHTML = '';
+                if(snapshot.empty) {
+                    inboxList.innerHTML = '<span class="text-xs text-gray-500 italic px-2">No hay aprendices aún.</span>';
+                    return;
+                }
+                
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const div = document.createElement('div');
+                    div.className = "bg-transparent hover:bg-gray-800/50 border border-transparent hover:border-gray-700 p-3 rounded-lg cursor-pointer transition-colors";
+                    div.innerHTML = `
+                        <p class="font-bold text-gray-300 text-sm mb-1">${data.name || data.email}</p>
+                        <p class="text-xs text-gray-500 truncate">Ver conversación...</p>
+                    `;
+                    div.addEventListener('click', () => {
+                        openChat(docSnap.id, data.name || data.email);
+                    });
+                    inboxList.appendChild(div);
+                });
+            });
+        };
+
+        const openChat = (uid, name) => {
+            currentChatUid = uid;
+            currentChatName = name;
+            
+            document.getElementById('no-chat-selected').classList.add('hidden');
+            document.getElementById('chat-area').classList.remove('hidden');
+            document.getElementById('chat-header-name').innerText = name;
+            
+            if (chatUnsubscribe) chatUnsubscribe();
+            
+            const chatMessages = document.getElementById('teacher-chat-messages');
+            const q = query(collection(db, "messages"), where("studentId", "==", uid));
+            chatUnsubscribe = onSnapshot(q, (snapshot) => {
+                chatMessages.innerHTML = '';
+                if(snapshot.empty) {
+                    chatMessages.innerHTML = '<div class="text-xs text-gray-500 text-center mt-4">No hay mensajes.</div>';
+                    return;
+                }
+                
+                let msgs = [];
+                snapshot.forEach(docSnap => msgs.push(docSnap.data()));
+                msgs.sort((a,b) => {
+                    const tA = a.createdAt ? a.createdAt.toMillis() : 0;
+                    const tB = b.createdAt ? b.createdAt.toMillis() : 0;
+                    return tA - tB;
+                });
+                
+                msgs.forEach(msg => {
+                    const isTeacher = msg.sender === 'teacher';
+                    const text = msg.text || msg.question;
+                    const dateObj = msg.createdAt ? msg.createdAt.toDate() : new Date();
+                    const time = dateObj.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                    
+                    const div = document.createElement('div');
+                    if (isTeacher) {
+                        div.className = "bg-primary/20 text-sm text-primary p-3 rounded-xl rounded-tr-sm max-w-[80%] self-end ml-auto border border-primary/30 shadow-lg";
+                        div.innerHTML = `${text} <span class="block text-[10px] text-primary/60 mt-2 text-right">${time}</span>`;
+                    } else {
+                        div.className = "bg-gray-800 text-sm text-gray-200 p-3 rounded-xl rounded-tl-sm max-w-[80%] shadow-lg border border-gray-700/50";
+                        div.innerHTML = `${text} <span class="block text-[10px] text-gray-500 mt-2 text-right">${time}</span>`;
+                    }
+                    if(msg.context && !isTeacher) {
+                        div.innerHTML = `<span class="block text-[9px] text-yellow-500 mb-1 border-b border-gray-600 pb-1">Ref: ${msg.context}</span>` + div.innerHTML;
+                    }
+                    chatMessages.appendChild(div);
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            });
+        };
+
+        document.getElementById('btn-teacher-send').addEventListener('click', async () => {
+            const input = document.getElementById('teacher-chat-input');
+            const text = input.value.trim();
+            if (!text || !currentChatUid) return;
+            
+            input.value = '';
+            try {
+                await addDoc(collection(db, "messages"), {
+                    studentId: currentChatUid,
+                    studentName: currentChatName,
+                    text: text,
+                    sender: 'teacher',
+                    createdAt: new Date()
+                });
+            } catch(err) {
+                console.error(err);
+                alert("Error enviando mensaje.");
+            }
+        });
+
+        const loadUsers = async () => {
+            const tbody = document.getElementById('users-tbody');
+            tbody.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-gray-500">Leyendo auras...</td></tr>';
+            
+            try {
+                const querySnapshot = await getDocs(collection(db, "users"));
+                tbody.innerHTML = '';
+                
+                querySnapshot.forEach((docSnap) => {
+                    const data = docSnap.data();
+                    const uid = docSnap.id;
+                    const tr = document.createElement('tr');
+                    
+                    const statusBadge = data.status === 'pending' 
+                        ? '<span class="px-2 py-1 bg-yellow-900/50 text-yellow-500 rounded text-xs">Pendiente</span>'
+                        : '<span class="px-2 py-1 bg-emerald-900/50 text-emerald-400 rounded text-xs">Aprobado</span>';
+                    
+                    const actions = data.status === 'pending' 
+                        ? `<button data-uid="${uid}" data-action="approve-student" class="action-btn text-emerald-400 hover:text-white mr-3 text-xs uppercase tracking-wider font-semibold">Aprobar</button>
+                           <button data-uid="${uid}" data-action="approve-admin" class="action-btn text-primary hover:text-white text-xs uppercase tracking-wider">Hacer Maestro</button>`
+                        : `<button data-uid="${uid}" data-action="manage-access" class="action-btn text-blue-400 hover:text-white text-xs uppercase tracking-wider mr-4 font-semibold">🔑 Accesos</button>
+                           <button data-uid="${uid}" data-action="revoke" class="action-btn text-red-400 hover:text-white text-xs uppercase tracking-wider">Revocar</button>`;
+                    
+                    tr.innerHTML = `
+                        <td class="py-3 px-4 font-medium">${data.name || 'Desconocido'}</td>
+                        <td class="py-3 px-4 text-gray-400">${data.email}</td>
+                        <td class="py-3 px-4 text-gray-400 capitalize">${data.role}</td>
+                        <td class="py-3 px-4">${statusBadge}</td>
+                        <td class="py-3 px-4 text-right">${actions}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Asignar eventos a los botones
+                document.querySelectorAll('.action-btn').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const uid = e.target.getAttribute('data-uid');
+                        const action = e.target.getAttribute('data-action');
+                        const userRef = doc(db, "users", uid);
+                        
+                        e.target.innerText = "...";
+                        
+                        try {
+                            if (action === 'approve-student') {
+                                await updateDoc(userRef, { status: 'approved', role: 'student' });
+                            } else if (action === 'approve-admin') {
+                                await updateDoc(userRef, { status: 'approved', role: 'admin' });
+                            } else if (action === 'revoke') {
+                                await updateDoc(userRef, { status: 'pending' });
+                            } else if (action === 'manage-access') {
+                                e.target.innerText = "🔑 Accesos"; // reset text
+                                currentManageUid = uid;
+                                const userDocSnap = await getDoc(userRef);
+                                const userData = userDocSnap.data();
+                                const userAccessibleModules = userData.accessibleModules || [];
+                                const userAccessibleExams = userData.accessibleExams || [];
+                                
+                                const accesosList = document.getElementById('accesos-list');
+                                const examsList = document.getElementById('accesos-exams-list');
+                                accesosList.innerHTML = '<span class="text-gray-500 text-sm">Cargando módulos...</span>';
+                                examsList.innerHTML = '<span class="text-gray-500 text-sm">Cargando exámenes...</span>';
+                                modalAccesos.classList.remove('hidden');
+                                
+                                // Cargar módulos
+                                const modulesSnap = await getDocs(collection(db, "modules"));
+                                let modsArray = [];
+                                modulesSnap.forEach(d => modsArray.push(d));
+                                modsArray.sort((a,b) => (a.data().order || 0) - (b.data().order || 0));
+                                
+                                accesosList.innerHTML = '';
+                                if (modsArray.length === 0) accesosList.innerHTML = '<span class="text-gray-500 text-sm">No hay módulos creados.</span>';
+                                modsArray.forEach(modDoc => {
+                                    const isChecked = userAccessibleModules.includes(modDoc.id) ? 'checked' : '';
+                                    const div = document.createElement('div');
+                                    div.className = 'flex items-center gap-3 bg-gray-800/50 p-3 rounded border border-gray-700';
+                                    div.innerHTML = `
+                                        <input type="checkbox" id="mod-${modDoc.id}" value="${modDoc.id}" class="module-checkbox w-4 h-4 text-primary bg-dark border-gray-600 rounded focus:ring-primary focus:ring-2" ${isChecked}>
+                                        <label for="mod-${modDoc.id}" class="text-sm font-medium text-gray-300 cursor-pointer flex-1">${modDoc.data().title}</label>
+                                    `;
+                                    accesosList.appendChild(div);
+                                });
+
+                                // Cargar exámenes
+                                const examsSnap = await getDocs(collection(db, "exams"));
+                                let examsArray = [];
+                                examsSnap.forEach(d => examsArray.push(d));
+                                examsArray.sort((a,b) => (a.data().order || 0) - (b.data().order || 0));
+
+                                examsList.innerHTML = '';
+                                if(examsArray.length === 0) examsList.innerHTML = '<span class="text-gray-500 text-sm">No hay exámenes creados.</span>';
+                                examsArray.forEach(examDoc => {
+                                    const isChecked = userAccessibleExams.includes(examDoc.id) ? 'checked' : '';
+                                    const div = document.createElement('div');
+                                    div.className = 'flex items-center gap-3 bg-gray-800/50 p-3 rounded border border-gray-700';
+                                    div.innerHTML = `
+                                        <input type="checkbox" id="exam-${examDoc.id}" value="${examDoc.id}" class="exam-checkbox w-4 h-4 text-primary bg-dark border-gray-600 rounded focus:ring-primary focus:ring-2" ${isChecked}>
+                                        <label for="exam-${examDoc.id}" class="text-sm font-medium text-gray-300 cursor-pointer flex-1">${examDoc.data().title}</label>
+                                    `;
+                                    examsList.appendChild(div);
+                                });
+                                return; // Skip loadUsers here
+                            }
+                            loadUsers(); // Recargar
+                        } catch(err) {
+                            console.error(err);
+                            alert("Error al procesar acción.");
+                        }
+                    });
+                });
+
+            } catch (error) {
+                console.error("Error fetching users:", error);
+                tbody.innerHTML = '<tr><td colspan="5" class="py-4 text-center text-red-500">Error leyendo auras.</td></tr>';
+            }
+        };
+
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const docRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(docRef);
+                    
+                    if (docSnap.exists() && docSnap.data().role === 'admin' && docSnap.data().status === 'approved') {
+                        document.getElementById('loading').style.display = 'none';
+                        document.getElementById('app-content').classList.remove('hidden');
+                        loadUsers();
+                        loadModules();
+                        loadInbox();
+                        loadExams();
+                    } else {
+                        // No es admin o no está aprobado
+                        signOut(auth).then(() => { window.location.href = 'dashboard.html'; });
+                    }
+                } catch (error) {
+                    signOut(auth).then(() => { window.location.href = 'index.html'; });
+                }
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+        // -------------------------
+        // LOGICA DE MODULOS Y MATERIAL
+        // -------------------------
+
+        const loadModules = () => {
+            onSnapshot(collection(db, "modules"), (snapshot) => {
+                const select = document.getElementById('material-module-select');
+                const list = document.getElementById('modules-list');
+                
+                select.innerHTML = '<option value="">Seleccionar Módulo de destino...</option>';
+                list.innerHTML = '';
+                
+                let modsArray = [];
+                snapshot.forEach(d => modsArray.push(d));
+                modsArray.sort((a,b) => (a.data().order || 0) - (b.data().order || 0));
+
+                modsArray.forEach(docSnap => {
+                    const data = docSnap.data();
+                    
+                    // Llenar Select
+                    const option = document.createElement('option');
+                    option.value = docSnap.id;
+                    option.textContent = data.title;
+                    select.appendChild(option);
+                    
+                    // Llenar Lista
+                    const li = document.createElement('li');
+                    li.className = "flex flex-col bg-gray-800/50 border border-gray-700/50 p-4 rounded-lg";
+                    li.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-primary">${data.title}</span>
+                            <div class="flex gap-2">
+                                <button data-id="${docSnap.id}" data-title="${data.title}" data-order="${data.order || 0}" class="btn-edit-module text-xs text-primary hover:text-yellow-400 p-1 uppercase tracking-wider">Editar</button>
+                                <button data-id="${docSnap.id}" class="btn-delete-module text-xs text-red-400 hover:text-red-300 p-1 uppercase tracking-wider">Eliminar</button>
+                            </div>
+                        </div>
+                        <div class="materials-container pl-4 border-l-2 border-gray-700 space-y-2 mt-2" id="materials-${docSnap.id}">
+                            <span class="text-xs text-gray-500 italic animate-pulse">Cargando material...</span>
+                        </div>
+                    `;
+                    list.appendChild(li);
+                    
+                    loadMaterialsForModule(docSnap.id);
+                });
+                
+                // Botones Eliminar Módulo
+                document.querySelectorAll('.btn-delete-module').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        if(confirm("¿Seguro que deseas eliminar este módulo? (Debes borrar los materiales antes manualmente)")) {
+                            const id = e.target.getAttribute('data-id');
+                            await deleteDoc(doc(db, "modules", id));
+                        }
+                    });
+                });
+
+                // Botones Editar Módulo
+                document.querySelectorAll('.btn-edit-module').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        const oldTitle = e.target.getAttribute('data-title');
+                        const oldOrder = e.target.getAttribute('data-order') || "0";
+
+                        const newTitle = prompt("Nuevo nombre del módulo:", oldTitle);
+                        if (newTitle === null || newTitle.trim() === '') return;
+
+                        const newOrder = prompt("Orden (número):", oldOrder);
+                        if (newOrder === null || newOrder.trim() === '') return;
+
+                        try {
+                            await updateDoc(doc(db, "modules", id), {
+                                title: newTitle.trim(),
+                                order: parseInt(newOrder) || 0
+                            });
+                        } catch (err) {
+                            console.error(err);
+                            alert("Error al actualizar el módulo");
+                        }
+                    });
+                });
+            });
+        };
+
+        const loadMaterialsForModule = (moduleId) => {
+            const q = query(collection(db, "materials"), where("moduleId", "==", moduleId));
+            onSnapshot(q, (snapshot) => {
+                const container = document.getElementById(`materials-${moduleId}`);
+                if (!container) return;
+                
+                container.innerHTML = '';
+                if (snapshot.empty) {
+                    container.innerHTML = '<span class="text-xs text-gray-500 italic">No hay material en este módulo.</span>';
+                    return;
+                }
+                
+                let docsArray = [];
+                snapshot.forEach(d => docsArray.push(d));
+                docsArray.sort((a,b) => (a.data().order || 0) - (b.data().order || 0));
+
+                docsArray.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const matDiv = document.createElement('div');
+                    matDiv.className = "flex justify-between items-center bg-black/40 p-2 rounded border border-gray-800";
+                    matDiv.innerHTML = `
+                        <a href="${data.url}" target="_blank" class="text-sm text-gray-300 hover:text-white truncate max-w-[120px] md:max-w-[200px] hover:underline" title="${data.title}">${data.title}</a>
+                        <div class="flex gap-2">
+                            <button data-id="${docSnap.id}" data-title="${data.title}" data-url="${data.url}" data-order="${data.order || 0}" class="btn-edit-material text-xs text-primary hover:text-yellow-400 p-1">Editar</button>
+                            <button data-id="${docSnap.id}" data-path="${data.storagePath}" class="btn-delete-material text-xs text-red-500 hover:text-red-400 p-1">Borrar</button>
+                        </div>
+                    `;
+                    container.appendChild(matDiv);
+                });
+                
+                // Botones Editar Material
+                container.querySelectorAll('.btn-edit-material').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.currentTarget.getAttribute('data-id');
+                        const oldTitle = e.currentTarget.getAttribute('data-title');
+                        const oldUrl = e.currentTarget.getAttribute('data-url');
+                        const oldOrder = e.currentTarget.getAttribute('data-order') || "0";
+                        
+                        const newTitle = prompt("Nuevo título:", oldTitle);
+                        if(newTitle === null || newTitle.trim() === '') return;
+                        
+                        const newUrl = prompt("Nueva URL:", oldUrl);
+                        if(newUrl === null || newUrl.trim() === '') return;
+                        
+                        const newOrder = prompt("Orden (número):", oldOrder);
+                        if(newOrder === null || newOrder.trim() === '') return;
+                        
+                        try {
+                            await updateDoc(doc(db, "materials", id), {
+                                title: newTitle.trim(),
+                                url: newUrl.trim(),
+                                order: parseInt(newOrder) || 0
+                            });
+                        } catch(err) {
+                            console.error(err);
+                            alert("Error al actualizar material.");
+                        }
+                    });
+                });
+
+                // Botones Eliminar Material
+                container.querySelectorAll('.btn-delete-material').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        if(confirm("¿Seguro que quieres eliminar este archivo?")) {
+                            const id = e.currentTarget.getAttribute('data-id');
+                            const path = e.currentTarget.getAttribute('data-path');
+                            try {
+                                await deleteDoc(doc(db, "materials", id));
+                                const fileRef = ref(storage, path);
+                                await deleteObject(fileRef);
+                            } catch(err) { 
+                                console.error("Error al borrar material", err); 
+                                alert("No se pudo eliminar de Storage (quizás ya no existe), pero se eliminó de la base de datos.");
+                            }
+                        }
+                    });
+                });
+            });
+        };
+
+        // -------------------------
+        // LOGICA DE EXAMENES
+        // -------------------------
+        const loadExams = () => {
+            onSnapshot(collection(db, "exams"), (snapshot) => {
+                const list = document.getElementById('exams-list');
+                list.innerHTML = '';
+                if(snapshot.empty) {
+                    list.innerHTML = '<div class="border border-gray-700/50 bg-black/40 rounded-lg p-8 flex flex-col items-center justify-center text-center col-span-full"><span class="text-gray-400 font-medium">No hay exámenes.</span></div>';
+                    return;
+                }
+                
+                let examsArray = [];
+                snapshot.forEach(d => examsArray.push(d));
+                examsArray.sort((a,b) => (a.data().order || 0) - (b.data().order || 0));
+
+                examsArray.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const div = document.createElement('div');
+                    div.className = "flex flex-col bg-gray-800/50 border border-gray-700/50 p-4 rounded-lg";
+                    div.innerHTML = `
+                        <div class="flex justify-between items-start mb-2">
+                            <span class="font-bold text-primary truncate" title="${data.title}">${data.title}</span>
+                            <div class="flex gap-2 flex-shrink-0 ml-2">
+                                <button data-id="${docSnap.id}" data-title="${data.title}" data-order="${data.order || 0}" data-url="${data.url}" class="btn-edit-exam text-xs text-primary hover:text-yellow-400 p-1 uppercase">Editar</button>
+                                <button data-id="${docSnap.id}" class="btn-delete-exam text-xs text-red-400 hover:text-red-300 p-1 uppercase">Eliminar</button>
+                            </div>
+                        </div>
+                        <a href="${data.url}" target="_blank" class="text-xs text-blue-400 hover:underline truncate w-full inline-block">${data.url}</a>
+                    `;
+                    list.appendChild(div);
+                });
+
+                // Editar Examen
+                document.querySelectorAll('.btn-edit-exam').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const id = e.target.getAttribute('data-id');
+                        const newTitle = prompt("Nuevo título del examen:", e.target.getAttribute('data-title'));
+                        if (!newTitle) return;
+                        const newUrl = prompt("Nueva URL (ej: Formulario Google):", e.target.getAttribute('data-url'));
+                        if (!newUrl) return;
+                        const newOrder = prompt("Orden:", e.target.getAttribute('data-order'));
+                        
+                        await updateDoc(doc(db, "exams", id), {
+                            title: newTitle.trim(),
+                            url: newUrl.trim(),
+                            order: parseInt(newOrder) || 0
+                        });
+                    });
+                });
+
+                // Eliminar Examen
+                document.querySelectorAll('.btn-delete-exam').forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        if(confirm("¿Eliminar este examen?")) {
+                            await deleteDoc(doc(db, "exams", e.target.getAttribute('data-id')));
+                        }
+                    });
+                });
+            });
+        };
+
+        document.getElementById('btn-create-exam').addEventListener('click', async () => {
+            const title = prompt("Título del Examen:");
+            if(!title) return;
+            const url = prompt("Enlace del examen (Google Form, Typeform, etc):");
+            if(!url) return;
+            const orderStr = prompt("Orden (número):", "0");
+            
+            try {
+                await addDoc(collection(db, "exams"), {
+                    title: title.trim(),
+                    url: url.trim(),
+                    order: parseInt(orderStr) || 0,
+                    createdAt: new Date()
+                });
+            } catch(e) {
+                console.error(e);
+                alert("Error al crear examen.");
+            }
+        });
+
+        // Crear Módulo
+        document.getElementById('btn-create-module').addEventListener('click', async () => {
+            const title = prompt("Escribe el Título del nuevo Módulo (Ej: Módulo 3: Mentalismo):");
+            if (title && title.trim() !== '') {
+                const orderStr = prompt("¿Qué número de orden tendrá? (0, 1, 2...)", "0");
+                const order = parseInt(orderStr) || 0;
+                try {
+                    await addDoc(collection(db, "modules"), {
+                        title: title.trim(),
+                        order: order,
+                        createdAt: new Date()
+                    });
+                } catch (e) {
+                    console.error(e);
+                    alert("Error al crear módulo");
+                }
+            }
+        });
+
+        // Añadir Material (Enlaces)
+        document.getElementById('btn-upload-material').addEventListener('click', async () => {
+            const titleInput = document.getElementById('material-title');
+            const moduleSelect = document.getElementById('material-module-select');
+            const typeSelect = document.getElementById('material-type-select');
+            const urlInput = document.getElementById('material-url');
+            const statusText = document.getElementById('upload-status');
+            
+            const title = titleInput.value.trim();
+            const moduleId = moduleSelect.value;
+            const type = typeSelect.value;
+            let url = urlInput.value.trim();
+            
+            if (!title || !moduleId || !url) {
+                alert("Por favor, completa el título, el módulo y pega un enlace.");
+                return;
+            }
+
+            statusText.innerText = "Vinculando magia...";
+            statusText.classList.remove('hidden');
+            document.getElementById('btn-upload-material').disabled = true;
+            
+            try {
+                const orderStr = prompt("¿Qué número de orden tendrá? (0, 1, 2...)", "0");
+                const order = parseInt(orderStr) || 0;
+                
+                await addDoc(collection(db, "materials"), {
+                    title: title,
+                    moduleId: moduleId,
+                    url: url,
+                    type: type,
+                    order: order,
+                    createdAt: new Date()
+                });
+                
+                statusText.innerText = "¡Material vinculado con éxito!";
+                setTimeout(() => { statusText.classList.add('hidden'); }, 3000);
+                titleInput.value = '';
+                urlInput.value = '';
+            } catch (error) {
+                console.error("Upload error:", error);
+                statusText.innerText = "Error: " + error.message;
+                alert("No se pudo vincular el material. Error: " + error.message);
+            }
+            document.getElementById('btn-upload-material').disabled = false;
+        });
+
+    </script>
+</body>
+</html>
