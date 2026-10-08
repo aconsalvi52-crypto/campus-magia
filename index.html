@@ -12,27 +12,27 @@
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Cinzel', 'serif'] },
-                    colors: { dark: '#050505', surface: '#0a0a0c', surface_hover: '#141418', primary: '#d4af37', primary_hover: '#b5952f' }
+                    colors: { dark: '#050505', surface: '#1c0b2b', surface_hover: '#2d1147', primary: '#a855f7', primary_hover: '#c084fc' }
                 }
             }
         }
     </script>
     <style>
         body { background-color: #050505; color: #ffffff; font-family: 'Inter', sans-serif; overflow: hidden; }
-        .ambient-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(212, 175, 55, 0.12) 0%, rgba(5, 5, 5, 0) 70%); top: -200px; right: -200px; z-index: 0; pointer-events: none; }
-        .ambient-glow-2 { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(212, 175, 55, 0.08) 0%, rgba(5, 5, 5, 0) 70%); bottom: -150px; left: -150px; z-index: 0; pointer-events: none; }
-        .glass-panel { background: rgba(10, 10, 12, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(212, 175, 55, 0.2); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(212, 175, 55, 0.08); }
+        .ambient-glow { position: absolute; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, rgba(5, 5, 5, 0) 70%); top: -200px; right: -200px; z-index: 0; pointer-events: none; }
+        .ambient-glow-2 { position: absolute; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(168, 85, 247, 0.1) 0%, rgba(5, 5, 5, 0) 70%); bottom: -150px; left: -150px; z-index: 0; pointer-events: none; }
+        .glass-panel { background: rgba(28, 11, 43, 0.7); backdrop-filter: blur(24px); border: 1px solid rgba(168, 85, 247, 0.3); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(168, 85, 247, 0.1); }
         .input-group { position: relative; margin-bottom: 1.5rem; }
         .input-group input { width: 100%; background: rgba(255, 255, 255, 0.02); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff; padding: 1.25rem 1rem 0.5rem 1rem; border-radius: 0.5rem; outline: none; transition: all 0.3s ease; }
-        .input-group input:focus { border-color: #d4af37; background: rgba(212, 175, 55, 0.03); box-shadow: 0 0 15px rgba(212, 175, 55, 0.1); }
+        .input-group input:focus { border-color: #a855f7; background: rgba(168, 85, 247, 0.03); box-shadow: 0 0 15px rgba(168, 85, 247, 0.15); }
         .input-group label { position: absolute; left: 1rem; top: 1rem; color: #6b7280; transition: all 0.2s ease; pointer-events: none; font-size: 1rem; }
-        .input-group input:focus ~ label, .input-group input:not(:placeholder-shown) ~ label { top: 0.35rem; font-size: 0.75rem; color: #d4af37; font-weight: 500; }
-        .btn-primary { background: linear-gradient(135deg, #d4af37, #b5952f); color: #050505; transition: transform 0.2s, box-shadow 0.2s; }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(212, 175, 55, 0.4); }
-        .logo-gold-filter { filter: sepia(100%) saturate(200%) brightness(95%) hue-rotate(5deg) contrast(120%) drop-shadow(0 0 15px rgba(212,175,55,0.2)); }
+        .input-group input:focus ~ label, .input-group input:not(:placeholder-shown) ~ label { top: 0.35rem; font-size: 0.75rem; color: #a855f7; font-weight: 500; }
+        .btn-primary { background: linear-gradient(135deg, #7c3aed, #a855f7); color: #ffffff; transition: transform 0.2s, box-shadow 0.2s; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(168, 85, 247, 0.5); }
+        .logo-gold-filter { filter: invert(1) drop-shadow(0 0 15px rgba(168,85,247,0.6)); opacity: 0.9; mix-blend-mode: screen; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center relative bg-[url('https://www.transparenttextures.com/patterns/stardust.png')]">
+<body class="min-h-screen flex items-center justify-center relative bg-gradient-to-br from-[#050505] via-[#1c0b2b] to-[#3b0764]">
     <div class="ambient-glow"></div><div class="ambient-glow-2"></div>
     <div class="glass-panel w-full max-w-md p-10 rounded-2xl z-10 relative">
         <div class="text-center mb-8">
@@ -58,7 +58,7 @@
 
             <button type="submit" class="btn-primary w-full font-bold py-3.5 rounded-lg flex justify-center items-center uppercase tracking-wider text-sm">
                 <span id="btn-text">Ingresar al Campus</span>
-                <svg id="btn-loader" class="animate-spin h-5 w-5 ml-3 hidden text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+                <span id="btn-loader" class="hidden ml-2">✨</span>
             </button>
         </form>
         

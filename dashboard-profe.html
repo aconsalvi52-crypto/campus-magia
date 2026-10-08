@@ -7,31 +7,61 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Cinzel', 'serif'] }, colors: { dark: '#050505', surface: '#0a0a0c', primary: '#d4af37' } } } }
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Cinzel', 'serif'] }, colors: { dark: '#050505', surface: '#1c0b2b', primary: '#a855f7', accent: '#c084fc' } } } }
     </script>
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #050505; color: #fff; overflow-x: hidden; }
-        .glass { background: rgba(10, 10, 12, 0.8); backdrop-filter: blur(12px); border: 1px solid rgba(212,175,55,0.15); }
+        .glass { background: rgba(28, 11, 43, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(168, 85, 247, 0.3); }
         .btn-action { transition: all 0.2s; }
         .btn-action:hover { transform: scale(1.05); }
-        .tab-btn.active { color: #d4af37; border-bottom: 2px solid #d4af37; }
+        .tab-btn.active { color: #c084fc; border-bottom: 2px solid #c084fc; }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
     </style>
 </head>
-<body class="min-h-screen bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] relative">
-    
+<body class="min-h-screen bg-gradient-to-br from-[#050505] via-[#1c0b2b] to-[#3b0764] relative">
+    <!-- Decoraciones Mágicas -->
+    <div class="fixed inset-0 pointer-events-none z-0 opacity-[0.03] flex justify-between items-center overflow-hidden">
+        <svg class="absolute top-20 left-10 w-32 h-32 transform -rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect width="14" height="20" x="5" y="2" rx="2" stroke-width="1.5"/><path stroke-width="1.5" d="M9 7l1 1-1 1M15 17l-1-1 1-1"/></svg>
+        <svg class="absolute top-10 right-20 w-40 h-40 transform rotate-12" fill="currentColor" viewBox="0 0 24 24"><path d="M12,4c2.2,0,4.2,0.9,5.7,2.3c0.3,0.3,0.5,0.7,0.5,1.2c0,0.4-0.1,0.8-0.4,1.1c-0.2,0.2-0.5,0.3-0.8,0.3c-0.4,0-0.7-0.1-1-0.4 c-0.8-0.8-2-1.4-3.2-1.4c-1.3,0-2.5,0.5-3.4,1.4c-0.3,0.3-0.7,0.4-1.1,0.4c-0.4,0-0.8-0.1-1.1-0.4C6.5,7.9,6.2,7.5,6.2,7 c0-0.4,0.2-0.8,0.5-1.1C8.2,4.8,10.1,4,12,4z M22,13c0,0.5-0.2,0.9-0.5,1.2C20,15.6,18,16.5,16,16.5c-2.3,0-4.5-1.1-5.9-2.8 c-0.6-0.7-1-1.6-1.1-2.5C8.9,11,8.9,10.9,8.9,10.8c0-0.4,0.2-0.8,0.5-1.1c0.3-0.3,0.7-0.4,1.1-0.4c0.4,0,0.8,0.1,1.1,0.4 c1.2,1.2,2.8,1.9,4.4,1.9c1.9,0,3.6-0.8,4.8-2.1c0.3-0.3,0.6-0.4,1-0.4c0.4,0,0.8,0.2,1.1,0.5C21.8,12.1,22,12.5,22,13z"/></svg>
+        <svg class="absolute bottom-20 left-20 w-24 h-24 transform rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" stroke-width="1.5"/><circle cx="12" cy="12" r="6" stroke-width="1.5" stroke-dasharray="2 2"/></svg>
+        <svg class="absolute bottom-10 right-10 w-32 h-32 transform -rotate-45" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 5l4 4-11 11-4-4 11-11z M5 15l4 4 M19 3l2 2"/></svg>
+    </div>
+
     <div id="loading" class="fixed inset-0 flex items-center justify-center bg-dark z-[200]">
-        <div class="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-primary"></div>
+        <div class="text-4xl animate-pulse">✨</div>
     </div>
 
     <div id="app-content" class="hidden max-w-7xl mx-auto p-6">
-        <header class="flex flex-col md:flex-row justify-between items-center glass p-6 rounded-2xl mb-6">
-            <div class="mb-4 md:mb-0">
-                <h1 class="text-2xl font-serif font-bold text-primary">Inquisición (Panel del Maestro)</h1>
-                <p class="text-sm text-gray-400">Gestiona a los iniciados, módulos, exámenes y correspondencia.</p>
+        <header class="flex flex-col md:flex-row justify-between items-center glass p-6 rounded-2xl mb-6 relative">
+            <div class="mb-4 md:mb-0 flex items-center gap-4">
+                <div class="w-12 h-12 rounded-full flex items-center justify-center shadow-[0_0_20px_rgba(230,200,117,0.3)] bg-dark/50 border border-primary/30 p-1">
+                    <img src="./logo.png" alt="EAAM Logo" class="w-full h-full object-contain filter invert mix-blend-screen opacity-90">
+                </div>
+                <div>
+                    <h1 class="text-2xl font-serif font-bold text-primary">Inquisición (Panel del Maestro)</h1>
+                    <p class="text-sm text-gray-400">Gestiona a los iniciados, módulos, exámenes y correspondencia.</p>
+                </div>
             </div>
-            <button id="btn-logout" class="text-sm text-primary hover:text-white transition-colors border border-primary px-4 py-2 rounded">Cerrar Tomo</button>
+            <div class="flex items-center gap-4">
+                <!-- Notificaciones Admin -->
+                <div class="relative group z-50">
+                    <button id="btn-notifications" class="text-gray-400 hover:text-primary transition-colors p-2 focus:outline-none relative">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <span id="bell-notification-badge" class="hidden absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-[#15051a]"></span>
+                    </button>
+                    <!-- Dropdown de notificaciones -->
+                    <div id="notifications-panel" class="absolute right-0 mt-2 w-72 glass border border-primary/30 rounded-xl shadow-xl overflow-hidden flex flex-col opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-opacity duration-300">
+                        <div class="p-3 border-b border-primary/30 bg-dark/80">
+                            <h3 class="text-sm font-bold text-white">Mensajes de Iniciados</h3>
+                        </div>
+                        <div id="notifications-list" class="max-h-64 overflow-y-auto p-2 text-sm text-gray-300 flex flex-col gap-2">
+                            <span class="p-2 text-gray-500 text-center">No hay mensajes nuevos.</span>
+                        </div>
+                    </div>
+                </div>
+                <button id="btn-logout" class="text-sm text-primary hover:text-white transition-colors border border-primary px-4 py-2 rounded">Cerrar Tomo</button>
+            </div>
         </header>
 
         <!-- Navegación por Tabs -->
@@ -249,31 +279,43 @@
         let currentChatUid = null;
         let currentChatName = "";
         let chatUnsubscribe = null;
+        window.studentUsers = [];
+        window.unreadStudentIds = new Set();
+        
+        const renderInbox = () => {
+            const inboxList = document.getElementById('inbox-list');
+            inboxList.innerHTML = '';
+            if (window.studentUsers.length === 0) {
+                inboxList.innerHTML = '<span class="text-xs text-gray-500 italic px-2">No hay aprendices aún.</span>';
+                return;
+            }
+            window.studentUsers.forEach(data => {
+                const div = document.createElement('div');
+                const isUnread = window.unreadStudentIds.has(data.id);
+                const bgColor = isUnread ? "bg-purple-900/40 border-purple-500/50" : "bg-transparent border-transparent";
+                const textColor = isUnread ? "text-purple-300" : "text-gray-300";
+                
+                div.className = `${bgColor} hover:bg-gray-800/50 border hover:border-gray-700 p-3 rounded-lg cursor-pointer transition-colors`;
+                div.innerHTML = `
+                    <p class="font-bold ${textColor} text-sm mb-1">${data.name || data.email} ${isUnread ? '🔴' : ''}</p>
+                    <p class="text-xs text-gray-500 truncate">Ver conversación...</p>
+                `;
+                div.addEventListener('click', () => {
+                    openChat(data.id, data.name || data.email);
+                });
+                inboxList.appendChild(div);
+            });
+        };
 
         const loadInbox = () => {
-            const inboxList = document.getElementById('inbox-list');
             const q = query(collection(db, "users"), where("role", "==", "student"));
             
             onSnapshot(q, (snapshot) => {
-                inboxList.innerHTML = '';
-                if(snapshot.empty) {
-                    inboxList.innerHTML = '<span class="text-xs text-gray-500 italic px-2">No hay aprendices aún.</span>';
-                    return;
-                }
-                
+                window.studentUsers = [];
                 snapshot.forEach(docSnap => {
-                    const data = docSnap.data();
-                    const div = document.createElement('div');
-                    div.className = "bg-transparent hover:bg-gray-800/50 border border-transparent hover:border-gray-700 p-3 rounded-lg cursor-pointer transition-colors";
-                    div.innerHTML = `
-                        <p class="font-bold text-gray-300 text-sm mb-1">${data.name || data.email}</p>
-                        <p class="text-xs text-gray-500 truncate">Ver conversación...</p>
-                    `;
-                    div.addEventListener('click', () => {
-                        openChat(docSnap.id, data.name || data.email);
-                    });
-                    inboxList.appendChild(div);
+                    window.studentUsers.push({ id: docSnap.id, ...docSnap.data() });
                 });
+                renderInbox();
             });
         };
 
@@ -339,6 +381,14 @@
                     studentName: currentChatName,
                     text: text,
                     sender: 'teacher',
+                    createdAt: new Date()
+                });
+                
+                await addDoc(collection(db, "notifications"), {
+                    userId: currentChatUid,
+                    title: 'Respuesta del Maestro',
+                    text: text,
+                    read: false,
                     createdAt: new Date()
                 });
             } catch(err) {
@@ -476,6 +526,7 @@
                         loadModules();
                         loadInbox();
                         loadExams();
+                        loadNotifications('admin');
                     } else {
                         // No es admin o no está aprobado
                         signOut(auth).then(() => { window.location.href = 'dashboard.html'; });
@@ -797,6 +848,47 @@
             }
             document.getElementById('btn-upload-material').disabled = false;
         });
+
+        const loadNotifications = (uid) => {
+            const q = query(collection(db, "notifications"), where("userId", "==", uid), where("read", "==", false));
+            onSnapshot(q, (snapshot) => {
+                const badge = document.getElementById('bell-notification-badge');
+                const list = document.getElementById('notifications-list');
+                
+                // Actualizar estado global de alumnos no leídos
+                window.unreadStudentIds.clear();
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    if (data.studentId) window.unreadStudentIds.add(data.studentId);
+                });
+                if (typeof renderInbox === 'function') renderInbox();
+
+                list.innerHTML = '';
+                if(snapshot.empty) {
+                    if (badge) badge.classList.add('hidden');
+                    if (list) list.innerHTML = '<span class="p-2 text-gray-500 text-center">No hay mensajes nuevos.</span>';
+                    return;
+                }
+                
+                if (badge) badge.classList.remove('hidden');
+                snapshot.forEach(docSnap => {
+                    const data = docSnap.data();
+                    const div = document.createElement('div');
+                    div.className = "p-2 hover:bg-white/5 rounded cursor-pointer transition-colors border-b border-primary/10";
+                    div.innerHTML = `<p class="text-primary font-bold text-xs">${data.title}</p><p class="text-gray-400 text-xs truncate">${data.text}</p>`;
+                    div.onclick = async () => {
+                        try {
+                            await updateDoc(doc(db, "notifications", docSnap.id), { read: true });
+                            document.querySelector('[data-target="tab-mensajes"]').click();
+                            if (data.studentId && data.studentName) {
+                                openChat(data.studentId, data.studentName);
+                            }
+                        } catch(e) { console.error(e); }
+                    };
+                    if (list) list.appendChild(div);
+                });
+            });
+        };
 
     </script>
 </body>
